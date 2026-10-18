@@ -1,54 +1,65 @@
-**Title:** NIKKE store on winewayland: white view, game exits when it closes, dropdowns close at once
+**Title:** NIKKE: in-game store stays white and closing it ends the game on the Wayland driver
 
-With DWProton 11.0-14, `WINE_GRAPHICS_DRIVER=wayland` and `DISPLAY` kept
-for the launcher fallback, NIKKE's in-game store (opened from the game,
-rendered by the INTL WebView/CEF) has three problems on a GNOME Wayland
-session. The same white store and exit on close also happen in Bottles with
-`WINE_GRAPHICS_DRIVER=wayland`. Running the whole game on X11 avoids all
-three.
+**Template:** Compatibility Report
 
-1. **The store view stays white.** `INTLWebViewHelper.exe` is in user32's
-   list of programs forced onto winex11, so its output never reaches the
-   game's Wayland window. Removing it from the list is not enough on its
-   own: the helper's GPU process runs with
-   `--use-angle=swiftshader-webgl` and its renderers with
-   `--disable-gpu-compositing`, so Chromium's software output device copies
-   each frame into the browser's HWND with `GetDC`/`BitBlt`/`ReleaseDC`.
-   That HWND's top-level belongs to the game process, the helper has no
-   window surface for it, and the null driver's `PutImage` drops the bits.
+# Compatibility Report
+- Name of the game with compatibility issues: GODDESS OF VICTORY: NIKKE
+- Steam AppID of the game: None, not a Steam game (started with `proton run`)
 
-2. **Closing the store ends the game.** Hiding the store hides an owned
-   popup while a popup it owns is still visible. winewayland destroys the
-   parent `xdg_popup` first, the compositor reports a protocol error and
-   Wine exits:
+## System Information
+- GPU: AMD Radeon RX 9070 XT
+- Video driver version: Mesa 26.2.4 (radeonsi, RADV)
+- Kernel version: 7.2.10-1-default (openSUSE Tumbleweed 20261014)
+- Link to full system information report as [Gist](https://gist.github.com/): attached as `nikke-sysinfo.txt` (inxi output; the game is not run through Steam)
+- Proton version: dwproton-11.0-14
+
+## I confirm:
+- [x] that I haven't found an existing compatibility report for this game.
+- [x] that I have checked whether there are updates for my system available.
+
+The other NIKKE reports (#72, #55, #29) are about different problems.
+
+<!-- Please add `PROTON_LOG=1 %command%` to the game's launch options and
+attach the generated $HOME/steam-$APPID.log to this issue report as a file.
+(Proton logs compress well if needed.)-->
+
+## Symptoms <!-- What's the problem? -->
+
+With the game on Wine's Wayland driver (`WINE_GRAPHICS_DRIVER=wayland`,
+with `DISPLAY` also set so the launcher can use X11), on a GNOME 50.5
+Wayland session:
+
+1. The in-game store opens as an empty white view.
+2. Closing the store ends the game. The attached log shows, at lines
+   85735-85737:
 
    ```
-   xdg_wm_base: error 2: destroyed popup not top most popup
-   waylanddrv_unix_read_events Protocol error
-   wayland_read_events_thread Failed to read events from the compositor, terminating process
+   xdg_wm_base#13: error 2: destroyed popup not top most popup
+   5100.302:07fc:0864:err:waylanddrv:waylanddrv_unix_read_events Protocol error on xdg_wm_base#13 with code 2
+   5100.302:07fc:0864:err:waylanddrv:wayland_read_events_thread Failed to read events from the compositor, terminating process
    ```
 
-   This also reproduces with GE-Proton 11-9.
+The attached log is Proton's output with the Wine debug channels that
+`PROTON_LOG=1` enables ([proton#L1944-L1945][proton-channels]), set
+directly in `WINEDEBUG`. NIKKE is not started from Steam, so `SteamGameId`
+is unset. Proton then writes no `steam-$APPID.log`
+([proton#L1862-L1863][proton-log]), and with `PROTON_LOG` set it turns
+Wine's logging off ([proton#L2336-L2337][proton-log-setup],
+[proton#L2383-L2384][proton-log-off]). The `+unwind` channel alone wrote
+30.2 million `trace:unwind` lines (2.7 GB); those lines are removed from
+the attached log. The only other change is a payment checkout token in a
+store URL, replaced with `REDACTED`.
 
-3. **Dropdowns in the store, such as the billing city, close as soon as
-   they open.** CEF's browser runs in the game process. Its `<select>`
-   popup is an unowned `Chrome_WidgetWin_0` with
-   `WS_POPUP|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|WS_THICKFRAME` and
-   `WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW`, shown without activation.
-   `is_window_managed` treats any `WS_THICKFRAME` window as managed, so it
-   becomes an `xdg_toplevel`; GNOME gives it keyboard focus, the game window
-   loses focus and Chromium closes the dropdown. A `+waylanddrv,+keyboard`
-   trace shows a keyboard leave on the game window and an enter on the new
-   popup each time.
+## Reproduction
 
-I have a four-patch series for these, developed and tested in NIKKE with
-`dwproton/11.0-14` and now rebased onto `dwproton/11.0-15` (Wine
-`f078dded59f559884b58fbf0769847e9c9fbb3ac`). With the series applied to
-11.0-14, the store renders, closing it keeps the game running, and the
-dropdowns stay open and work with the mouse, the scrollbar and the
-keyboard. The mouse wheel does not scroll a dropdown yet.
+1. Start NIKKE with dwproton-11.0-14 and `WINE_GRAPHICS_DRIVER=wayland` on
+   a GNOME Wayland session.
+2. Open the store from the game. It stays white.
+3. Close the store. The game exits.
 
-The 11.0-15 source branch still forces the helper onto X11 and lacks the
-popup and bitmap fixes. The 11.0-15 build has not been tested in NIKKE.
+This issue was written with the help of generative AI.
 
-This issue and the patches were prepared with the help of generative AI.
+[proton-channels]: https://dawn.wine/dawn-winery/dwproton/src/commit/8b178c8870a68f5012ee4a1d82078fa5a7b3a814/proton#L1944-L1945
+[proton-log]: https://dawn.wine/dawn-winery/dwproton/src/commit/8b178c8870a68f5012ee4a1d82078fa5a7b3a814/proton#L1862-L1863
+[proton-log-setup]: https://dawn.wine/dawn-winery/dwproton/src/commit/8b178c8870a68f5012ee4a1d82078fa5a7b3a814/proton#L2336-L2337
+[proton-log-off]: https://dawn.wine/dawn-winery/dwproton/src/commit/8b178c8870a68f5012ee4a1d82078fa5a7b3a814/proton#L2383-L2384

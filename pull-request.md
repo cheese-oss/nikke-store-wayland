@@ -1,28 +1,34 @@
 **Title:** winewayland/win32u: Fix NIKKE's in-game store on Wayland
 
-Fixes #ISSUE (white store, game exit when the store closes, dropdowns
-closing at once). Four commits, in this order:
+Fixes #ISSUE: the white store, the game exit when the store closes, and
+the store's dropdowns closing at once (see the issue's first comment).
+The Proton log is attached to #ISSUE. Four commits, in this order:
 
 1. **winewayland.drv: Retire nested popup roles before their parent.**
    Tracks live popup descendants and clears their roles first, so hiding an
    owner before its owned popups no longer violates xdg-shell's destruction
-   order. Compositor dismissal goes through the same path. Stands alone.
+   order ([xdg-shell.xml#L1281-L1286][xdg-destroy]). Compositor dismissal
+   goes through the same path. Stands alone.
 2. **win32u: Forward bitmap copies into windows of another process.**
    For a DC whose top-level belongs to another process and that has no
-   window surface, clipped 32-bit `SRCCOPY` images are queued and, on
-   `ReleaseDC`, mapped read-only into the top-level's process, which paints
-   them through a DC of the target window. The receiver only accepts a
-   whole mapped view of the expected size. Other raster operations and
-   formats are discarded as before.
-3. **user32: Let INTLWebViewHelper.exe use the Wayland driver.** Depends on
-   2; without it, the store would stay white on Wayland.
+   window surface ([dce.c#L905-L911][dce-surface]), clipped 32-bit
+   `SRCCOPY` images are queued and, on `ReleaseDC`, mapped read-only into
+   the top-level's process, which paints them through a DC of the target
+   window. The receiver only accepts a whole mapped view of the expected
+   size. Other raster operations and formats are still discarded by the
+   null driver
+   ([driver.c#L411-L416][nulldrv-putimage]).
+3. **user32: Let INTLWebViewHelper.exe use the Wayland driver.** Removes
+   it from the X11 list ([user_main.c#L185-L189][user32-list]). Depends on
+   2; without it, the store stays white on Wayland.
    `nikke_launcher.exe` and `tbs_browser.exe` keep the X11 fallback.
 4. **winewayland.drv: Keep non-activating tool popups unmanaged.**
    `WS_POPUP` windows with `WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW` (and not
    `WS_EX_APPWINDOW`) that are not being activated are no longer managed
-   because of a thick frame, so they become ungrabbed `xdg_popup`s. For an
-   unowned popup whose owner hint (the window beside it) belongs to another
-   process, the foreground window is used as the parent instead.
+   because of a thick frame ([window.c#L436-L437][managed-thickframe]), so
+   they become ungrabbed `xdg_popup`s. For an unowned popup whose owner
+   hint (the window beside it) belongs to another process, the foreground
+   window is used as the parent instead.
 
 **Testing.** Each commit builds on 11.0-15. Small Win32 reproducers were
 run on a standalone 11.0-15 Wine build (Wayland only, without X11, audio
@@ -73,3 +79,9 @@ The series is rebased onto `dwproton/11.0-15`, Wine
 user32 helper-list deletion changed; the other three patches are unchanged.
 
 This pull request and its patches were prepared with the help of generative AI.
+
+[xdg-destroy]: https://gitlab.freedesktop.org/wayland/wayland-protocols/-/blob/1.49/stable/xdg-shell/xdg-shell.xml#L1281-1286
+[dce-surface]: https://dawn.wine/dawn-winery/wine-dwproton/src/commit/f078dded59f559884b58fbf0769847e9c9fbb3ac/dlls/win32u/dce.c#L905-L911
+[nulldrv-putimage]: https://dawn.wine/dawn-winery/wine-dwproton/src/commit/f078dded59f559884b58fbf0769847e9c9fbb3ac/dlls/win32u/driver.c#L411-L416
+[user32-list]: https://dawn.wine/dawn-winery/wine-dwproton/src/commit/f078dded59f559884b58fbf0769847e9c9fbb3ac/dlls/user32/user_main.c#L185-L189
+[managed-thickframe]: https://dawn.wine/dawn-winery/wine-dwproton/src/commit/f078dded59f559884b58fbf0769847e9c9fbb3ac/dlls/winewayland.drv/window.c#L436-L437
