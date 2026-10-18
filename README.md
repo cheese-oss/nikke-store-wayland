@@ -32,5 +32,5 @@ and issue templates ask for:
 - a full system information report, attached to the issue as
   `nikke-sysinfo.txt`;
 - a Proton log that shows the white store and the exit, attached to the
-  issue as `nikke-proton-11.0-14.log.xz`;
+  issue as `nikke-proton-11.0-14.log.gz` (Forgejo does not accept `.xz`);
 - `#ISSUE` in `pull-request.md` replaced with the issue number.
