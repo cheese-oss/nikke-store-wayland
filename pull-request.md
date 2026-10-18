@@ -13,10 +13,12 @@ The Proton log is attached to #ISSUE. Four commits, in this order:
    For a DC whose top-level belongs to another process and that has no
    window surface ([dce.c#L905-L911][dce-surface]), clipped 32-bit
    `SRCCOPY` images are queued and, on `ReleaseDC`, mapped read-only into
-   the top-level's process, which paints them through a DC of the target
-   window. The receiver only accepts a whole mapped view of the expected
-   size. Other raster operations and formats are still discarded by the
-   null driver
+   the top-level's process and announced with an internal message; that
+   process paints them through a DC of the target window. Any process can
+   post that message, so the receiver only accepts a whole read-only view
+   that starts with the sender's tag, checks copies of the header and region
+   rather than the shared memory, and leaves any other mapping alone. Other
+   raster operations and formats are still discarded by the null driver
    ([driver.c#L411-L416][nulldrv-putimage]).
 3. **user32: Let INTLWebViewHelper.exe use the Wayland driver.** Removes
    it from the X11 list ([user_main.c#L185-L189][user32-list]). Depends on
@@ -46,7 +48,8 @@ or Schannel), with the unpatched and then the patched modules:
 
 Weston accepts the unpatched popup teardown, so that case uses Mutter. The
 dropdown check shows that a wheel event is delivered, not that a store
-dropdown scrolls.
+dropdown scrolls. A further probe posts the internal message with the
+address of an unrelated mapping; the receiver leaves that mapping alone.
 
 The same reproducers were run earlier with the DWProton 11.0-14 runner and
 these modules swapped in, under Weston and headless Mutter with virtual
