@@ -30,8 +30,8 @@ with `DISPLAY` also set so the launcher can use X11), on a GNOME 50.5
 Wayland session:
 
 1. The in-game store opens as an empty white view.
-2. Closing the store ends the game. The log on Gist shows, at lines
-   6332-6334:
+2. Closing the store (`INTLWebViewHelper.exe`) ends the game. The log on
+   Gist shows, at lines 6332-6334:
 
    ```
    xdg_wm_base#13: error 2: destroyed popup not top most popup

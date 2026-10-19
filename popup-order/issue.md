@@ -27,8 +27,8 @@ attach the generated $HOME/steam-$APPID.log to this issue report as a file.
 ## Symptoms <!-- What's the problem? -->
 
 With `WINE_GRAPHICS_DRIVER=wayland` and `DISPLAY` set, on a GNOME 50.5
-Wayland session, closing the in-game store ends the game. The
-log on Gist shows, at lines 6332-6334:
+Wayland session, closing the in-game store (`INTLWebViewHelper.exe`) ends
+the game. The log on Gist shows, at lines 6332-6334:
 
 ```
 xdg_wm_base#13: error 2: destroyed popup not top most popup
