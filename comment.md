@@ -1,7 +1,5 @@
 This comment and the patches were written with the help of generative AI.
 
-**First comment on the issue: tests and patches**
-
 The store's dropdowns also close as soon as they open; this becomes
 visible once the store renders.
 

@@ -1,7 +1,5 @@
 This comment and the patch were written with the help of generative AI.
 
-**First comment on the issue: tests and a patch**
-
 Two small Win32 programs, run through `proton run` under headless Mutter
 with the published dwproton-11.0-15 runner and with a copy whose modules
 include the patch below:
