@@ -12,15 +12,15 @@ the game, and its dropdowns close as soon as they open.
   developers want one.
 - [patches/](patches/): the series, in dependency order.
 
-The patches apply to Wine `f078dded59f559884b58fbf0769847e9c9fbb3ac` on
-branch `dwproton/11.0-15` of
+The patches apply to Wine `b75a4125963073b01d2b3bfce6060d697d02066b`, the
+source of the `dwproton-11.0-15` release, on branch `dwproton/11.0-15` of
 <https://dawn.wine/dawn-winery/wine-dwproton.git>:
 
 ```sh
 git clone --branch dwproton/11.0-15 \
   https://dawn.wine/dawn-winery/wine-dwproton.git
 cd wine-dwproton
-git checkout f078dded59f559884b58fbf0769847e9c9fbb3ac
+git checkout b75a4125963073b01d2b3bfce6060d697d02066b
 git am /path/to/patches/*.patch
 ```
 
