@@ -42,8 +42,7 @@ and keyboard. The mouse wheel still does not scroll a store dropdown.
 GE-Proton also has a patch for the popup protocol error, included from
 GE-Proton11-10: [b492349d][ge-fix].
 
-If you want them as a pull request against `wine-dwproton` (dwproton's
-`wine` submodule), I can open one.
+If you want a pull request, I can open one.
 
 This comment and the patches were prepared with the help of generative AI.
 

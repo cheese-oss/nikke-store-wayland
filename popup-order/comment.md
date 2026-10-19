@@ -29,8 +29,7 @@ that lock, the second program failed 9 of 25 runs.
 GE-Proton has a patch for the same protocol error, included from
 GE-Proton11-10: [b492349d][ge-fix] ([issue 834][ge-issue]).
 
-If you want it as a pull request against `wine-dwproton` (dwproton's
-`wine` submodule), I can open one.
+If you want a pull request, I can open one.
 
 This comment was written with the help of generative AI.
 
