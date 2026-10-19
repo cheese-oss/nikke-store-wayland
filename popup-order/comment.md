@@ -1,3 +1,5 @@
+This comment and the patch were written with the help of generative AI.
+
 **First comment on the issue: tests and a patch**
 
 Two small Win32 programs, run through `proton run` under headless Mutter
@@ -30,8 +32,6 @@ GE-Proton has a patch for the same protocol error, included from
 GE-Proton11-10: [b492349d][ge-fix] ([issue 834][ge-issue]).
 
 If you want a pull request, I can open one.
-
-This comment and the patch were written with the help of generative AI.
 
 [window-probe]: https://github.com/cheese-oss/dwproton-nikke-split/blob/7ab01306283af86c8ae50b4a96bec499adee7963/tests/window-probe.c
 [race-probe]: https://github.com/cheese-oss/dwproton-nikke-split/blob/7ab01306283af86c8ae50b4a96bec499adee7963/tests/popup-race-probe.c
