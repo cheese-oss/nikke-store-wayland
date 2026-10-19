@@ -36,16 +36,9 @@ xdg_wm_base#13: error 2: destroyed popup not top most popup
 61320.942:06ac:0724:err:waylanddrv:wayland_read_events_thread Failed to read events from the compositor, terminating process
 ```
 
-The attached `nikke-proton-11.0-15.log.gz` contains Proton's output.
-The Wine debug channels used by `PROTON_LOG=1`
-([proton#L1981-L1982][proton-channels]) were set directly in
-`WINEDEBUG`, with `trace-unwind` to disable unwind traces. For this
-non-Steam launch, `SteamGameId` is unset: Proton would not create a
-`steam-$APPID.log` ([proton#L1887-L1888][proton-log]), and enabling
-`PROTON_LOG=1` would turn Wine logging off
-([proton#L2372-L2373][proton-log-setup],
-[proton#L2419-L2420][proton-log-off]). Two checkout URLs were replaced
-with `REDACTED_SHOP_URL`.
+The attached `nikke-proton-11.0-15.log.gz` was captured with Proton's
+[usual Wine debug channels][proton-channels], set through `WINEDEBUG`,
+with unwind tracing disabled. Two checkout URLs were redacted.
 
 ## Reproduction
 
@@ -57,6 +50,3 @@ with `REDACTED_SHOP_URL`.
 This issue was written with the help of generative AI.
 
 [proton-channels]: https://dawn.wine/dawn-winery/dwproton/src/commit/b8c56daa4cd1f8ce0ce9c4135bf587e063e4b02f/proton#L1981-L1982
-[proton-log]: https://dawn.wine/dawn-winery/dwproton/src/commit/b8c56daa4cd1f8ce0ce9c4135bf587e063e4b02f/proton#L1887-L1888
-[proton-log-setup]: https://dawn.wine/dawn-winery/dwproton/src/commit/b8c56daa4cd1f8ce0ce9c4135bf587e063e4b02f/proton#L2372-L2373
-[proton-log-off]: https://dawn.wine/dawn-winery/dwproton/src/commit/b8c56daa4cd1f8ce0ce9c4135bf587e063e4b02f/proton#L2419-L2420
