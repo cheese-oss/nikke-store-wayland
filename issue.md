@@ -17,7 +17,7 @@
 - [x] that I haven't found an existing compatibility report for this game.
 - [x] that I have checked whether there are updates for my system available.
 
-The other NIKKE reports (#72, #55, #29) are about different problems.
+The existing NIKKE reports cover different problems.
 
 <!-- Please add `PROTON_LOG=1 %command%` to the game's launch options and
 attach the generated $HOME/steam-$APPID.log to this issue report as a file.
