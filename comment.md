@@ -44,7 +44,7 @@ GE-Proton11-10: [b492349d][ge-fix].
 
 If you want a pull request, I can open one.
 
-This comment and the patches were prepared with the help of generative AI.
+This comment and the patches were written with the help of generative AI.
 
 [patch1]: https://github.com/cheese-oss/nikke-store-wayland/blob/2e6480c92e29deee3de579a6bc0782673c487289/patches/0001-winewayland.drv-Retire-nested-popup-roles-before-the.patch
 [patch2]: https://github.com/cheese-oss/nikke-store-wayland/blob/2e6480c92e29deee3de579a6bc0782673c487289/patches/0002-win32u-Forward-bitmap-copies-into-windows-of-another.patch
