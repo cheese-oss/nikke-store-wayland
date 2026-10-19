@@ -1,45 +1,31 @@
 **Title:** winewayland/win32u: Fix NIKKE's in-game store on Wayland
 
 Fixes #ISSUE: the white store, the game exit when the store closes, and
-the store's dropdowns closing at once (see the issue's first comment).
-The Proton log is attached to #ISSUE. Four commits, in this order:
+its dropdowns closing at once. The Proton log is attached to #ISSUE.
 
-1. **winewayland.drv: Retire nested popup roles before their parent.**
-   Tracks live popup descendants and clears their roles first, so hiding an
-   owner before its owned popups no longer violates xdg-shell's destruction
-   order ([xdg-shell.xml#L1281-L1286][xdg-destroy]). Compositor dismissal
-   goes through the same path. A destroyed window's surface is torn down
-   with the window data lock held, since the popup lists link surfaces of
-   windows on other threads. Stands alone. GE-Proton fixed the same order
-   independently in [b492349d][ge-fix] (from GE-Proton11-10) by walking
-   all windows for popups owned by the surface; that patch targets
-   GE-Proton's driver and does not apply here.
-2. **win32u: Forward bitmap copies into windows of another process.**
-   For a DC whose top-level belongs to another process and that has no
-   window surface ([dce.c#L905-L911][dce-surface]), clipped 32-bit
-   `SRCCOPY` images are queued and, on `ReleaseDC`, mapped read-only into
-   the top-level's process and announced with an internal message; that
-   process paints them through a DC of the target window. Any process can
-   post that message, so the receiver only accepts a whole read-only view
-   that starts with the sender's tag, checks copies of the header and region
-   rather than the shared memory, and leaves any other mapping alone. Other
-   raster operations and formats are still discarded by the null driver
-   ([driver.c#L411-L416][nulldrv-putimage]).
-3. **user32: Let INTLWebViewHelper.exe use the Wayland driver.** Removes
-   it from the X11 list ([user_main.c#L185-L189][user32-list]). Depends on
-   2; without it, the store stays white on Wayland.
-   `nikke_launcher.exe` and `tbs_browser.exe` keep the X11 fallback.
-4. **winewayland.drv: Keep non-activating tool popups unmanaged.**
-   `WS_POPUP` windows with `WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW` (and not
-   `WS_EX_APPWINDOW`) that are not being activated are no longer managed
-   because of a thick frame ([window.c#L436-L437][managed-thickframe]), so
-   they become ungrabbed `xdg_popup`s. For an unowned popup whose owner
-   hint (the window beside it) belongs to another process, the foreground
-   window is used as the parent instead.
+Four commits against Wine `b75a4125963073b01d2b3bfce6060d697d02066b`
+(the dwproton-11.0-15 release), in dependency order:
 
-**Testing.** Each commit builds on 11.0-15. Small Win32 reproducers were
-run through `proton run` with the published 11.0-15 runner and with a copy
-of it using the patched modules, on headless Mutter and Weston:
+1. [Retire nested popup roles before their parent][patch1]. Clear child
+   roles first on teardown or compositor dismissal, and destroy window
+   surfaces under the window data lock. Stands alone.
+2. [Forward bitmap copies into another process's windows][patch2]. Queue
+   clipped 32-bit `SRCCOPY` images until `ReleaseDC`, then map them
+   read-only into the receiving process for painting. Validate copied
+   headers and regions; leave unrelated mappings alone.
+3. [Let INTLWebViewHelper.exe use Wayland][patch3]. Remove its forced-X11
+   entry; depends on patch 2. The launcher and `tbs_browser.exe` retain
+   their X11 fallback.
+4. [Keep non-activating tool popups unmanaged][patch4]. Use ungrabbed
+   popups even with a thick frame; for an unowned popup with a parent
+   hint in another process, use the foreground window instead.
+
+GE-Proton also has a patch for the popup protocol error, included from
+GE-Proton11-10: [b492349d][ge-fix].
+
+Each commit builds on 11.0-15. [Small Win32 reproducers][tests] were run
+through `proton run` with the published runner and a copy using the
+patched modules, under headless Weston and Mutter:
 
 | Check | 11.0-15 | Patched |
 | --- | --- | --- |
@@ -52,31 +38,26 @@ of it using the patched modules, on headless Mutter and Weston:
 | Chromium-style dropdown, Mutter | Loses focus | Stays open; click, wheel and key delivered |
 | Dropdown hide and reopen, Mutter | — | Passes |
 
-Weston accepts the unpatched popup teardown, so those cases use Mutter.
-The two-thread case lets a thread exit with a nested popup pair still
-mapped while the owner's thread hides the owner; without the lock in the
-first patch it also fails with the protocol error, intermittently. The
-dropdown check shows that a wheel event is delivered, not that a store
-dropdown scrolls. A further probe posts the internal message with the
-address of an unrelated mapping; the receiver leaves that mapping alone.
+Weston accepts the unpatched popup teardown, so those checks use Mutter.
+The two-thread probe passed 25 of 25 runs with the patch (300 iterations
+each); without its window data lock change, 9 of 25 runs failed. A
+further probe confirms that posting the bitmap message with an unrelated
+mapping's address leaves that mapping intact.
 
-In NIKKE with the series applied to 11.0-15, as with 11.0-14 before, the
-store renders, closing it keeps the game running, and its dropdowns stay
-open and work with the mouse, scrollbar and keyboard.
+In NIKKE on patched 11.0-15, as on 11.0-14 before, the store renders,
+closing it keeps the game running, and dropdowns work with the mouse,
+scrollbar and keyboard. The mouse wheel still does not scroll a store
+dropdown, despite event delivery in the probe.
 
-**Known limits.** The mouse wheel does not scroll a store dropdown yet.
-Forwarded images are copied once per `ReleaseDC`; a view posted to a
-window that is destroyed before handling it is not unmapped. Hardware
-cross-process output is not covered.
-
-The series applies to Wine `b75a4125963073b01d2b3bfce6060d697d02066b`,
-the source of the `dwproton-11.0-15` release.
+Bitmap forwarding covers clipped 32-bit `SRCCOPY`, not hardware output.
+Updates flush on `ReleaseDC`; a posted view can leak if its window is
+destroyed before handling the message.
 
 This pull request and its patches were prepared with the help of generative AI.
 
-[xdg-destroy]: https://gitlab.freedesktop.org/wayland/wayland-protocols/-/blob/1.49/stable/xdg-shell/xdg-shell.xml#L1281-1286
-[dce-surface]: https://dawn.wine/dawn-winery/wine-dwproton/src/commit/b75a4125963073b01d2b3bfce6060d697d02066b/dlls/win32u/dce.c#L905-L911
-[nulldrv-putimage]: https://dawn.wine/dawn-winery/wine-dwproton/src/commit/b75a4125963073b01d2b3bfce6060d697d02066b/dlls/win32u/driver.c#L411-L416
-[user32-list]: https://dawn.wine/dawn-winery/wine-dwproton/src/commit/b75a4125963073b01d2b3bfce6060d697d02066b/dlls/user32/user_main.c#L185-L189
-[managed-thickframe]: https://dawn.wine/dawn-winery/wine-dwproton/src/commit/b75a4125963073b01d2b3bfce6060d697d02066b/dlls/winewayland.drv/window.c#L436-L437
+[patch1]: https://github.com/cheese-oss/nikke-store-wayland/blob/2e6480c92e29deee3de579a6bc0782673c487289/patches/0001-winewayland.drv-Retire-nested-popup-roles-before-the.patch
+[patch2]: https://github.com/cheese-oss/nikke-store-wayland/blob/2e6480c92e29deee3de579a6bc0782673c487289/patches/0002-win32u-Forward-bitmap-copies-into-windows-of-another.patch
+[patch3]: https://github.com/cheese-oss/nikke-store-wayland/blob/2e6480c92e29deee3de579a6bc0782673c487289/patches/0003-user32-Let-INTLWebViewHelper.exe-use-the-Wayland-dri.patch
+[patch4]: https://github.com/cheese-oss/nikke-store-wayland/blob/2e6480c92e29deee3de579a6bc0782673c487289/patches/0004-winewayland.drv-Keep-non-activating-tool-popups-unma.patch
+[tests]: https://github.com/cheese-oss/dwproton-nikke-split/tree/7ab01306283af86c8ae50b4a96bec499adee7963/tests
 [ge-fix]: https://github.com/GloriousEggroll/proton-ge-custom/commit/b492349d0233dcff26c5a585ddd3f2a4c8c3095c

@@ -12,6 +12,18 @@ the game, and its dropdowns close as soon as they open.
   developers want one.
 - [patches/](patches/): the series, in dependency order.
 
+The first patch stands alone and fixes only the game exit when the store
+closes; GE-Proton has a patch for the same protocol error. It has its own
+drafts in [popup-order/](popup-order/):
+
+- [popup-order/issue.md](popup-order/issue.md): an issue about the exit
+  alone, in the same template, with the same attachments.
+- [popup-order/comment.md](popup-order/comment.md): its first comment,
+  with the tests and the patch.
+
+If that issue is posted first, the store drafts should refer to it for
+the first patch instead of describing the exit again.
+
 The patches apply to Wine `b75a4125963073b01d2b3bfce6060d697d02066b`, the
 source of the `dwproton-11.0-15` release, on branch `dwproton/11.0-15` of
 <https://dawn.wine/dawn-winery/wine-dwproton.git>:
