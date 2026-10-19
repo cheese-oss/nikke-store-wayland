@@ -1,4 +1,4 @@
-This comment, the patches, and the test programs were written with the help of generative AI.
+**This comment, the patches, and the test programs were written with the help of generative AI.**
 
 The store's dropdowns also close as soon as they open; this becomes
 visible once the store renders.

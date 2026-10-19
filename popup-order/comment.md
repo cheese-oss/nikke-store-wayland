@@ -1,4 +1,4 @@
-This comment, the patch, and the test programs were written with the help of generative AI.
+**This comment, the patch, and the test programs were written with the help of generative AI.**
 
 Two small Win32 programs, run through `proton run` under headless Mutter
 with the published dwproton-11.0-15 runner and with a copy whose modules
