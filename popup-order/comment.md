@@ -13,8 +13,7 @@ Under headless Weston, the first program does not get the protocol error
 with the unpatched runner.
 
 In NIKKE, with the patch applied together with three other patches for the
-store, closing the store keeps the game running, with 11.0-14 and with
-11.0-15.
+store on 11.0-15, closing the store keeps the game running.
 
 **Patch**, against Wine `b75a4125963073b01d2b3bfce6060d697d02066b` (the
 dwproton-11.0-15 release):

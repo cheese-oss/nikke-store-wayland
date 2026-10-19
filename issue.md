@@ -11,7 +11,7 @@
 - Video driver version: Mesa 26.2.4 (radeonsi, RADV)
 - Kernel version: 7.2.10-1-default (openSUSE Tumbleweed 20261014)
 - Link to full system information report as [Gist](https://gist.github.com/): attached as `nikke-sysinfo.txt` (inxi output; the game is not run through Steam)
-- Proton version: dwproton-11.0-14
+- Proton version: dwproton-11.0-15
 
 ## I confirm:
 - [x] that I haven't found an existing compatibility report for this game.
@@ -31,35 +31,35 @@ Wayland session:
 
 1. The in-game store opens as an empty white view.
 2. Closing the store ends the game. The attached log shows, at lines
-   85735-85737:
+   75822-75824:
 
    ```
    xdg_wm_base#13: error 2: destroyed popup not top most popup
-   5100.302:07fc:0864:err:waylanddrv:waylanddrv_unix_read_events Protocol error on xdg_wm_base#13 with code 2
-   5100.302:07fc:0864:err:waylanddrv:wayland_read_events_thread Failed to read events from the compositor, terminating process
+   61320.942:06ac:0724:err:waylanddrv:waylanddrv_unix_read_events Protocol error on xdg_wm_base#13 with code 2
+   61320.942:06ac:0724:err:waylanddrv:wayland_read_events_thread Failed to read events from the compositor, terminating process
    ```
 
-The attached log is Proton's output with the Wine debug channels that
-`PROTON_LOG=1` enables ([proton#L1944-L1945][proton-channels]), set
-directly in `WINEDEBUG`. NIKKE is not started from Steam, so `SteamGameId`
-is unset. Proton then writes no `steam-$APPID.log`
-([proton#L1862-L1863][proton-log]), and with `PROTON_LOG` set it turns
-Wine's logging off ([proton#L2336-L2337][proton-log-setup],
-[proton#L2383-L2384][proton-log-off]). The `+unwind` channel alone wrote
-30.2 million `trace:unwind` lines (2.7 GB); those lines are removed from
-the attached log. The only other change is a payment checkout token in a
-store URL, replaced with `REDACTED`.
+The attached `nikke-proton-11.0-15.log.gz` contains Proton's output.
+The Wine debug channels used by `PROTON_LOG=1`
+([proton#L1981-L1982][proton-channels]) were set directly in
+`WINEDEBUG`, with `trace-unwind` to disable unwind traces. For this
+non-Steam launch, `SteamGameId` is unset: Proton would not create a
+`steam-$APPID.log` ([proton#L1887-L1888][proton-log]), and enabling
+`PROTON_LOG=1` would turn Wine logging off
+([proton#L2372-L2373][proton-log-setup],
+[proton#L2419-L2420][proton-log-off]). Two checkout URLs were replaced
+with `REDACTED_SHOP_URL`.
 
 ## Reproduction
 
-1. Start NIKKE with dwproton-11.0-14 and `WINE_GRAPHICS_DRIVER=wayland` on
+1. Start NIKKE with dwproton-11.0-15 and `WINE_GRAPHICS_DRIVER=wayland` on
    a GNOME Wayland session.
 2. Open the store from the game. It stays white.
 3. Close the store. The game exits.
 
 This issue was written with the help of generative AI.
 
-[proton-channels]: https://dawn.wine/dawn-winery/dwproton/src/commit/8b178c8870a68f5012ee4a1d82078fa5a7b3a814/proton#L1944-L1945
-[proton-log]: https://dawn.wine/dawn-winery/dwproton/src/commit/8b178c8870a68f5012ee4a1d82078fa5a7b3a814/proton#L1862-L1863
-[proton-log-setup]: https://dawn.wine/dawn-winery/dwproton/src/commit/8b178c8870a68f5012ee4a1d82078fa5a7b3a814/proton#L2336-L2337
-[proton-log-off]: https://dawn.wine/dawn-winery/dwproton/src/commit/8b178c8870a68f5012ee4a1d82078fa5a7b3a814/proton#L2383-L2384
+[proton-channels]: https://dawn.wine/dawn-winery/dwproton/src/commit/b8c56daa4cd1f8ce0ce9c4135bf587e063e4b02f/proton#L1981-L1982
+[proton-log]: https://dawn.wine/dawn-winery/dwproton/src/commit/b8c56daa4cd1f8ce0ce9c4135bf587e063e4b02f/proton#L1887-L1888
+[proton-log-setup]: https://dawn.wine/dawn-winery/dwproton/src/commit/b8c56daa4cd1f8ce0ce9c4135bf587e063e4b02f/proton#L2372-L2373
+[proton-log-off]: https://dawn.wine/dawn-winery/dwproton/src/commit/b8c56daa4cd1f8ce0ce9c4135bf587e063e4b02f/proton#L2419-L2420

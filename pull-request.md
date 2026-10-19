@@ -1,7 +1,7 @@
 **Title:** winewayland/win32u: Fix NIKKE's in-game store on Wayland
 
 Fixes #ISSUE: the white store, the game exit when the store closes, and
-its dropdowns closing at once. The Proton log is attached to #ISSUE.
+its dropdowns closing at once. The 11.0-15 Proton log is attached to #ISSUE.
 
 Four commits against Wine `b75a4125963073b01d2b3bfce6060d697d02066b`
 (the dwproton-11.0-15 release), in dependency order:
@@ -44,8 +44,8 @@ each); without its window data lock change, 9 of 25 runs failed. A
 further probe confirms that posting the bitmap message with an unrelated
 mapping's address leaves that mapping intact.
 
-In NIKKE on patched 11.0-15, as on 11.0-14 before, the store renders,
-closing it keeps the game running, and dropdowns work with the mouse,
+In NIKKE on patched 11.0-15, the store renders, closing it keeps the game
+running, and dropdowns work with the mouse,
 scrollbar and keyboard. The mouse wheel still does not scroll a store
 dropdown, despite event delivery in the probe.
 

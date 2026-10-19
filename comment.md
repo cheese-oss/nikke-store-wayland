@@ -1,8 +1,7 @@
 **First comment on the issue: tests and patches**
 
-With the whole game on X11, neither symptom happens. In Bottles with
-`WINE_GRAPHICS_DRIVER=wayland`, both happen. The store's dropdowns also
-close as soon as they open; this becomes visible once the store renders.
+The store's dropdowns also close as soon as they open; this becomes
+visible once the store renders.
 
 [Small Win32 test programs][tests], run through `proton run` with the
 published 11.0-15 runner and with a copy using the patched modules, under
@@ -23,10 +22,9 @@ Weston accepts the unpatched popup teardown, so those checks use Mutter.
 A further probe posts the bitmap message with an unrelated mapping's
 address; the patched receiver leaves the mapping alone.
 
-In NIKKE with the series applied to 11.0-15, as with 11.0-14 before, the
-store renders, closing it keeps the game running, and its dropdowns work
-with the mouse, scrollbar and keyboard. The mouse wheel still does not
-scroll a store dropdown.
+In NIKKE with the series applied to 11.0-15, the store renders, closing it
+keeps the game running, and its dropdowns work with the mouse, scrollbar
+and keyboard. The mouse wheel still does not scroll a store dropdown.
 
 **Patches**, against Wine `b75a4125963073b01d2b3bfce6060d697d02066b`
 (the dwproton-11.0-15 release):
