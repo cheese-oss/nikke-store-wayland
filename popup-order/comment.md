@@ -1,19 +1,19 @@
 **This comment, the patch, and the test programs were written with the help of generative AI.**
 
 Two small Win32 programs, run through `proton run` under headless Mutter
-with the published dwproton-11.0-15 runner and with a copy whose modules
-include the patch below:
+with the published dwproton-11.0-15 runner and with a copy using only the
+patch below:
 
 | Test program | 11.0-15 | Patched |
 | --- | --- | --- |
 | Hides an owner window before its nested popup ([window-probe.c][window-probe]) | Same protocol error | Exits normally |
-| A thread exits with a nested popup pair still shown while another thread hides their owner ([popup-race-probe.c][race-probe]) | Same protocol error | 25 of 25 runs exit normally, 300 iterations each |
+| A thread exits with a nested popup pair still shown while another thread hides their owner ([popup-race-probe.c][race-probe]) | Same protocol error | 5 of 5 runs exit normally, 300 iterations each |
 
 Under headless Weston, the first program does not get the protocol error
 with the unpatched runner.
 
-In NIKKE, with the patch applied together with three other patches for the
-store on 11.0-15, closing the store keeps the game running.
+In NIKKE, with only this patch applied to stock dwproton-11.0-15, closing
+the in-game store keeps the game running.
 
 **Patch**, against Wine `b75a4125963073b01d2b3bfce6060d697d02066b` (the
 dwproton-11.0-15 release):
@@ -24,7 +24,8 @@ live child popups for each surface and clears their roles before the
 parent's, then asks their window threads to update them. It also destroys
 a window's surface with the window data lock held; the current code
 releases the lock first ([window.c#L101-L104][destroy-unlocked]). Without
-that lock, the second program failed 9 of 25 runs.
+that lock, an earlier full-series test of the second program failed 9 of
+25 runs.
 
 GE-Proton has a patch for the same protocol error, included from
 GE-Proton11-10: [b492349d][ge-fix] ([issue 834][ge-issue]).
