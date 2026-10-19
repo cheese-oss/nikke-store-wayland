@@ -1,7 +1,7 @@
 **Title:** winewayland/win32u: Fix NIKKE's in-game store on Wayland
 
 Fixes #ISSUE: the white store, the game exit when the store closes, and
-its dropdowns closing at once. The 11.0-15 Proton log is attached to #ISSUE.
+its dropdowns closing at once. The 11.0-15 Proton log is linked from #ISSUE.
 
 Four commits against Wine `b75a4125963073b01d2b3bfce6060d697d02066b`
 (the dwproton-11.0-15 release), in dependency order:

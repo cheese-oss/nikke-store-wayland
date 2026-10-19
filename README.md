@@ -17,7 +17,7 @@ closes; GE-Proton has a patch for the same protocol error. It has its own
 drafts in [popup-order/](popup-order/):
 
 - [popup-order/issue.md](popup-order/issue.md): an issue about the exit
-  alone, in the same template, with the same attachments.
+  alone, in the same template, with the same log and system information.
 - [popup-order/comment.md](popup-order/comment.md): its first comment,
   with the tests and the patch.
 
@@ -38,13 +38,12 @@ git am /path/to/patches/*.patch
 
 ## Before posting
 
-DWProton's [AGENTS.md](https://dawn.wine/dawn-winery/dwproton/src/branch/main/AGENTS.md)
-and issue templates ask for:
+Both issue drafts link to the same checked reports:
 
-- a full system information report, attached to the issue as
-  `nikke-sysinfo.txt`;
-- a Proton log that shows the white store and the exit, attached to the
-  issue as `nikke-proton-11.0-15.log.gz` (Forgejo does not accept `.xz`).
+- [System information](https://gist.github.com/cheese-oss/2b7af4bf2970d160e033aa0fe4ce637b): the full inxi report.
+- [DWProton 11.0-15 log](https://gist.github.com/cheese-oss/b2a8b517e6e772515fd74784990e3ca9): the redacted log with `trace:seh`
+  lines removed (789 KB). Warnings, errors, DLL loads and game debug
+  output are retained; the full log remains in the local `attachments/`
+  directory.
 
-Both issue drafts use the same 11.0-15 log and system information.
 Replace `#ISSUE` in `pull-request.md` with the issue number before posting.

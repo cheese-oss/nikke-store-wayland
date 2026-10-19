@@ -10,7 +10,7 @@
 - GPU: AMD Radeon RX 9070 XT
 - Video driver version: Mesa 26.2.4 (radeonsi, RADV)
 - Kernel version: 7.2.10-1-default (openSUSE Tumbleweed 20261014)
-- Link to full system information report as [Gist](https://gist.github.com/): attached as `nikke-sysinfo.txt` (inxi output; the game is not run through Steam)
+- Link to full system information report as [Gist][system-info] (inxi output; the game is not run through Steam)
 - Proton version: dwproton-11.0-15
 
 ## I confirm:
@@ -27,8 +27,8 @@ attach the generated $HOME/steam-$APPID.log to this issue report as a file.
 ## Symptoms <!-- What's the problem? -->
 
 With `WINE_GRAPHICS_DRIVER=wayland` and `DISPLAY` set, on a GNOME 50.5
-Wayland session, closing the in-game store ends the game. The attached
-log shows, at lines 75822-75824:
+Wayland session, closing the in-game store ends the game. The
+log on Gist shows, at lines 6332-6334:
 
 ```
 xdg_wm_base#13: error 2: destroyed popup not top most popup
@@ -36,9 +36,10 @@ xdg_wm_base#13: error 2: destroyed popup not top most popup
 61320.942:06ac:0724:err:waylanddrv:wayland_read_events_thread Failed to read events from the compositor, terminating process
 ```
 
-The attached `nikke-proton-11.0-15.log.gz` was captured with Proton's
-[usual Wine debug channels][proton-channels], set through `WINEDEBUG`,
-with unwind tracing disabled. Two checkout URLs were redacted.
+The [log on Gist][proton-log] was captured with Proton's
+[usual Wine debug channels][proton-channels], set through
+`WINEDEBUG`, with unwind tracing disabled. Exception trace (`trace:seh`)
+lines were removed to reduce the file size. Two checkout URLs were redacted.
 
 ## Reproduction
 
@@ -50,3 +51,6 @@ with unwind tracing disabled. Two checkout URLs were redacted.
 This issue was written with the help of generative AI.
 
 [proton-channels]: https://dawn.wine/dawn-winery/dwproton/src/commit/b8c56daa4cd1f8ce0ce9c4135bf587e063e4b02f/proton#L1981-L1982
+
+[system-info]: https://gist.github.com/cheese-oss/2b7af4bf2970d160e033aa0fe4ce637b
+[proton-log]: https://gist.github.com/cheese-oss/b2a8b517e6e772515fd74784990e3ca9
